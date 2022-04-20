@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package format="2">
+
+	<name>gesture_estimation</name>
+	<version>1.0.0</version>
+	<description>Gesture estimation using mediapipe</description>
+
+	<author email="peter@qrholm.eu">Peter Ørholm Nielsen</author>
+	<maintainer email="peter@qrholm.eu">Peter Ørholm Nielsen</maintainer>
+
+	<license>BSD</license>
+
+	<!-- <url type="repository">https://github.com/teleop-grasp/teleop_grasp</url> -->
+
+	<!-- build tool -->
+	<buildtool_depend>catkin</buildtool_depend>
+
+	<!-- libraries -->
+
+
+	<!-- ROS packages -->
+	<depend>rospy</depend>
+
+</package>
