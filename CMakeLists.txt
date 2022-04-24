@@ -17,7 +17,6 @@ find_package(
 # declare a catkin package
 catkin_package(
 	INCLUDE_DIRS
-		
 	LIBRARIES
 		gesture_estimation
 	CATKIN_DEPENDS
