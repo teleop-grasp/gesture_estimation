@@ -10,9 +10,9 @@ find_package(
 	catkin REQUIRED
 	COMPONENTS
 		rospy
+		sensor_msgs
+		cv_bridge
 )
-
-# find system libraries
 
 # declare a catkin package
 catkin_package(
@@ -21,22 +21,30 @@ catkin_package(
 		gesture_estimation
 	CATKIN_DEPENDS
 		rospy
+		sensor_msgs
+		cv_bridge
 	DEPENDS
-
+		python3-opencv
+		python3-mediapipe-pip
 )
 
 ################################################################################################
 
-# process setup.py
+# python package
+# http://www.artificialhumancompanions.com/structure-python-based-ros-package/
 
+## process setup.py
 catkin_python_setup()
 
-################################################################################################
-
-# install python nodes
-
-install(
+## install python nodes
+catkin_install_python(
 	PROGRAMS
-		nodes/hand_gesture
+		nodes/hand_gesture.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
+
+# install(
+# 	PROGRAMS
+# 		nodes/hand_gesture
+# 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )

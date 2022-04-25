@@ -10,15 +10,17 @@
 
 	<license>BSD</license>
 
-	<!-- <url type="repository">https://github.com/teleop-grasp/teleop_grasp</url> -->
+	<url type="repository">https://github.com/teleop-grasp/gesture_estimation</url>
 
 	<!-- build tool -->
 	<buildtool_depend>catkin</buildtool_depend>
 
-	<!-- libraries -->
-
-
 	<!-- ROS packages -->
 	<depend>rospy</depend>
+	<depend>sensor_msgs</depend>
+	<depend>cv_bridge</depend>
+	<depend>python3-opencv</depend>
+	<!-- <depend>python3-mediapipe-pip</depend> -->
+	<!-- <depend>python3-cv-zone</depend> -->
 
 </package>
