@@ -1,5 +1,3 @@
-
-
 def fingers_up(hand):
     """
     Inspired by  By: Computer Vision Zone

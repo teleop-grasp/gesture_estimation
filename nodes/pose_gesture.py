@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import cv2
-import numpy as np
 import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
@@ -12,11 +10,6 @@ from hand_tracking.plot_utils import draw_hand_lms, Pose3DViewer
 from hand_tracking.tracking import track_hands, track_body
 from hand_tracking.pose_estimation import get_pose
 
-print("loading trackers done...")
-
-
-
-
 if __name__=="__main__":
 
     rospy.init_node("pose_gesture")
@@ -25,23 +18,25 @@ if __name__=="__main__":
     topic_grasp_state = params["topic_grasp_state"]
     topic_pose_hand = params["topic_pose_hand"]
     topic_image_hand = params["topic_image_hand"]
+    show_visualizations = params["show_visualizations"]
 
-    pub_gesture = rospy.Publisher(topic_grasp_state, Bool, queue_size=10)
-    pub_pose = rospy.Publisher(topic_pose_hand, Pose, queue_size=10)
-    pub_img_hand = rospy.Publisher(topic_image_hand, Image, queue_size=10)
+    pub_gesture = rospy.Publisher(topic_grasp_state, Bool, queue_size=1)
+    pub_pose = rospy.Publisher(topic_pose_hand, Pose, queue_size=1)
+
+    if show_visualizations:
+        pub_img_hand = rospy.Publisher(topic_image_hand, Image, queue_size=1)
+
     bridge = CvBridge()
-
-
     hand_type = 'right'
     Pose3DViewer = Pose3DViewer()
 
-    rate = rospy.Rate(10) # 10hz
+    rate = rospy.Rate(30) # 30hz
     while not rospy.is_shutdown():
         # Get image msg
         img_msg = rospy.wait_for_message(params["topic_image_raw"], Image)
 
         # Convert to openCV format
-        cv_img = bridge.imgmsg_to_cv2(img_msg, desired_encoding='rgb8')
+        cv_img = bridge.imgmsg_to_cv2(img_msg, desired_encoding='bgr8')
 
         hands = track_hands(cv_img)    
         body = track_body(cv_img)
@@ -57,11 +52,14 @@ if __name__=="__main__":
 
             if body is not None:
                 pose = get_pose(hand, body)
-                Pose3DViewer.plot_pose(pose, hand)
                 pose_msg = to_message(Pose, pose)
                 pub_pose.publish(pose_msg)
 
+                if show_visualizations:
+                    Pose3DViewer.plot_pose(pose, hand)
+
             pub_gesture.publish(gesture)
-            pub_img_hand.publish(bridge.cv2_to_imgmsg(cv_img, encoding="rgb8"))
-            
+
+            if show_visualizations:
+                pub_img_hand.publish(bridge.cv2_to_imgmsg(cv_img, encoding="bgr8"))
         rate.sleep()
