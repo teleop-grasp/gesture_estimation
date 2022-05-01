@@ -12,6 +12,7 @@ setup_args = generate_distutils_setup(
 	install_requires=[
 		"opencv-python"
 		"cvzone",
+		"numpy-ros"
 	]
 )
 

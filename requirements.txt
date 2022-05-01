@@ -5,3 +5,4 @@ cvzone==1.5.6
 opencv_contrib_python==4.5.5.64
 rospy==1.15.14
 sensor_msgs==1.13.1
+numpy-ros

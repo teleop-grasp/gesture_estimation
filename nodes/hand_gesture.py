@@ -4,7 +4,10 @@ from gesture_estimation import get_gesture
 import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
+from geometry_msgs.msg import Pose
 from cv_bridge import CvBridge
+from numpy_ros import to_message 
+import numpy as np
 
 if __name__=="__main__":
 
@@ -16,6 +19,10 @@ if __name__=="__main__":
     
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
+
+        # R = np.eye(4)
+        # pose = to_message(Pose, R)
+        # print(pose)
 
         # Get image msg
         img_msg = rospy.wait_for_message(params["topic_image_raw"], Image)
