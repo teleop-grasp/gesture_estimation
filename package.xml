@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <package format="2">
 
-	<name>gesture_estimation</name>
+	<name>hand_tracking</name>
 	<version>1.0.0</version>
-	<description>Gesture estimation using mediapipe</description>
+	<description>Hand tracking using mediapipe</description>
 
 	<author email="peter@qrholm.eu">Peter Ørholm Nielsen</author>
 	<maintainer email="peter@qrholm.eu">Peter Ørholm Nielsen</maintainer>
 
 	<license>BSD</license>
 
-	<url type="repository">https://github.com/teleop-grasp/gesture_estimation</url>
+	<url type="repository">https://github.com/teleop-grasp/hand_tracking</url>
 
 	<!-- build tool -->
 	<buildtool_depend>catkin</buildtool_depend>
@@ -20,7 +20,6 @@
 	<depend>sensor_msgs</depend>
 	<depend>cv_bridge</depend>
 	<depend>python3-opencv</depend>
-	<!-- <depend>python3-mediapipe-pip</depend> -->
-	<!-- <depend>python3-cv-zone</depend> -->
+	<depend>python3-mediapipe-pip</depend>
 
 </package>

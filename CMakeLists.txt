@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(gesture_estimation)
+project(hand_tracking)
 
 # C++17
 set(CMAKE_CXX_STANDARD 17)
@@ -18,14 +18,14 @@ find_package(
 catkin_package(
 	INCLUDE_DIRS
 	LIBRARIES
-		gesture_estimation
+		hand_tracking
 	CATKIN_DEPENDS
 		rospy
 		sensor_msgs
 		cv_bridge
-	DEPENDS
 		python3-opencv
 		python3-mediapipe-pip
+	DEPENDS
 )
 
 ################################################################################################
@@ -39,12 +39,12 @@ catkin_python_setup()
 ## install python nodes
 catkin_install_python(
 	PROGRAMS
-		nodes/hand_gesture.py
+		nodes/pose_gesture.py
 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 # install(
 # 	PROGRAMS
-# 		nodes/hand_gesture
+# 		nodes/hand_tracking
 # 	DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )

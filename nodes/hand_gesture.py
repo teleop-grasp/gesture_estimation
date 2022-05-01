@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import cv2
-from gesture_estimation import get_gesture
 import rospy
 from sensor_msgs.msg import Image
 from std_msgs.msg import Bool
@@ -8,6 +7,7 @@ from geometry_msgs.msg import Pose
 from cv_bridge import CvBridge
 from numpy_ros import to_message 
 import numpy as np
+
 
 if __name__=="__main__":
 
