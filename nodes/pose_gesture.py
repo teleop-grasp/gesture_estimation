@@ -24,8 +24,8 @@ if __name__=="__main__":
 	topic_image_hand = params["topic_image_hand"]
 	topic_image_raw = params["topic_image_raw"]
 	visualize_tracking = params["visualize_tracking"]
-	ema_alpha_trans = params["ema_alpha_trans"] # 0.4 is decent
-	ema_alpha_rot = params["ema_alpha_rot"] # 0.2 is decent
+	estimate_depth = params["estimate_depth"]
+	ema_alpha_rot, ema_alpha_trans = params["ema_alpha"] # [R, t]
 
 	# config
 	LOOP_FREQ = 30 # hz
@@ -75,14 +75,14 @@ if __name__=="__main__":
 			cv_img = draw_hand_lms(cv_img, hand)
 
 			if body is not None:
-				pose = get_pose(hand, body, ema_alpha_trans, ema_alpha_rot)
+				pose = get_pose(hand, body, ema_alpha_trans, ema_alpha_rot, estimate_depth)
 				pose_msg = to_message(Pose, pose)
 				pub_pose.publish(pose_msg)
 
-				# rospy.logwarn_once("calibrating depth normalization...")
-				# rospy.logwarn_once("move your hand as far back and then as far forward as possible...")
-				# calibrate(pose, max_num_readings=100)
-				rospy.logwarn_once("x-axis (depth) is set constant at 0.5")
+				if estimate_depth:
+					rospy.logwarn_once("calibrating depth normalization...")
+					rospy.logwarn_once("move your hand as far back and then as far forward as possible...")
+					calibrate(pose, max_num_readings=100)
 
 			if visualize_tracking:
 				g_pose, g_hand = pose, hand

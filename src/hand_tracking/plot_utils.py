@@ -23,7 +23,6 @@ class Pose3DViewer:
 	def __init__(self) -> None:
 		self.fig = plt.figure()
 		self.ax = self.fig.add_subplot(111, projection="3d")
-		# self.ax.set_xlim(-0.7, 0.5)
 		self.ax.set_xlim(0, 1)
 		self.ax.set_ylim(0, 1)
 		self.ax.set_zlim(0, 1)

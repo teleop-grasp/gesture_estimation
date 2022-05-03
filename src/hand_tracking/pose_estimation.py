@@ -21,33 +21,38 @@ def get_hand_lms(body, hand_type: str="left") -> tuple:
 	return lms_pose_hand, lms_pose_hand_world
 
 @static_var(wrist_trans_prev=np.zeros(3))
-def get_translation(hand, body, ema_alpha=1.0) -> np.ndarray:
+def get_translation(hand, body, ema_alpha=1.0, estimate_depth=False) -> np.ndarray:
+
 	hand_type = hand["type"]
-	_, hand_pose_world = get_hand_lms(body, hand_type=hand_type)
+	hand_pose_img, hand_pose_world = get_hand_lms(body, hand_type=hand_type)
+	hand_pose = hand_pose_img # which one to use
+
 	lms_img = np.array(hand["lms_img"])
 	wrist_trans = np.zeros(3)
 	wrist_trans[0] = lms_img[0, 0]
 	wrist_trans[1] = 1 - lms_img[0, 1] # to make it have origin at lower corner instead of upper left corner
 
 	if CORRECT_Z_AXIS: # this will be set by calibrate()
-		wrist_trans[2] = 1 - (hand_pose_world[0, 2] + CORRECT_Z_AXIS) * Z_SCALE_FACTOR # to have approx same range as x,y
+		wrist_trans[2] = 1 - (hand_pose[0, 2] + CORRECT_Z_AXIS) * Z_SCALE_FACTOR # to have approx same range as x,y
 	else:
-		wrist_trans[2] = hand_pose_world[0, 2]
+		wrist_trans[2] = hand_pose[0, 2]
 
-	wrist_trans[2] = 0.5 # REMOVE DEPTH ESTIMATION
+	# use depth estimation?
+	wrist_trans[2] = wrist_trans[2] if estimate_depth else 0.5
 
 	# transform points to match XYZ of frame in hand
 	wrist_trans = R @ wrist_trans
 
 	# exponential moving avg filter
 	if ema_alpha < 1.0:
+		# ema_alpha = np.array([0.05, ema_alpha, ema_alpha]) # separate filter for X-axis (depth)
 		wrist_trans = ema_alpha * wrist_trans + (1 - ema_alpha) * get_translation.wrist_trans_prev
 		get_translation.wrist_trans_prev = wrist_trans
 
 	return wrist_trans
 
-def get_pose(hand, body, ema_alpha_trans=1.0, ema_alpha_rot=1.0) -> np.ndarray:
-	translation = get_translation(hand, body, ema_alpha_trans) # t
+def get_pose(hand, body, ema_alpha_trans=1.0, ema_alpha_rot=1.0, estimate_depth=False) -> np.ndarray:
+	translation = get_translation(hand, body, ema_alpha_trans, estimate_depth) # t
 	orientation = get_orientation(hand, ema_alpha_rot) # R
 	transformation = np.eye(4, dtype=np.float32) # [R, t]
 	transformation[:3, :3] = orientation
@@ -68,7 +73,7 @@ def get_orientation(hand, ema_alpha=1.0) -> np.ndarray:
 	x = np.cross(z, y)
 	x = -x / np.linalg.norm(x)
 	orientation = np.array([x,y,z]).T # rotation matrix
-	
+
 	if ema_alpha < 1.0:
 		quat_R = Rotation.from_matrix(orientation).as_quat()
 		quat_R = scipy.spatial.geometric_slerp(get_orientation.quat_R_prev, quat_R, ema_alpha)
