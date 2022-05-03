@@ -9,19 +9,21 @@ body_tracker = mp_body_pose.Pose(
 	static_image_mode=False,
 	model_complexity=2,
 	smooth_landmarks=True,
-	enable_segmentation=False,
+	enable_segmentation=True,
 	smooth_segmentation=True,
-	min_detection_confidence=0.5,
-	min_tracking_confidence=0.5
+	min_detection_confidence=0.7,
+	min_tracking_confidence=0.7
 )
 
 # hand + gesture tracking
 mp_hands = mp.solutions.hands
-hand_tracker = mp_hands.Hands(static_image_mode=False,
-						max_num_hands=2,
-						model_complexity=1,
-						min_detection_confidence=0.7,
-						min_tracking_confidence=0.7)
+hand_tracker = mp_hands.Hands(
+	static_image_mode=False,
+	max_num_hands=2,
+	model_complexity=1,
+	min_detection_confidence=0.7,
+	min_tracking_confidence=0.7
+)
 
 # rotation matrix to align pts
 R = Rotation.from_euler("yxz", [-np.pi/2, -np.pi/2, 0]).as_matrix()
