@@ -51,8 +51,8 @@ class Pose3DViewer:
 			self.scatter = self.ax.scatter(hand_lms_world[:, 0], hand_lms_world[:, 1], hand_lms_world[:, 2], linewidths=3, color="grey")
 
 		# https://stackoverflow.com/a/44352761, https://stackoverflow.com/a/40139416
-		self.fig.canvas.flush_events()
 		self.fig.canvas.draw()
+		self.fig.canvas.flush_events()
 		# self.fig.canvas.draw_idle()
 		# plt.pause(0.01)
 		# print(f"{(self.ax.azim, self.ax.elev) = }")

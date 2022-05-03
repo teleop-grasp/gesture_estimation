@@ -1,4 +1,5 @@
 import numpy as np
+import scipy
 from scipy.spatial.transform import Rotation
 
 HAND_LMS_INDICES = {"left": [15, 17, 19, 21], "right": [16, 18, 20, 22]}
@@ -20,7 +21,7 @@ def get_hand_lms(body, hand_type: str="left") -> tuple:
 	return lms_pose_hand, lms_pose_hand_world
 
 @static_var(wrist_trans_prev=np.zeros(3))
-def get_translation(hand, body, ema_alpha=0.8) -> np.ndarray:
+def get_translation(hand, body, ema_alpha=1.0) -> np.ndarray:
 	hand_type = hand["type"]
 	_, hand_pose_world = get_hand_lms(body, hand_type=hand_type)
 	lms_img = np.array(hand["lms_img"])
@@ -39,22 +40,23 @@ def get_translation(hand, body, ema_alpha=0.8) -> np.ndarray:
 	wrist_trans = R @ wrist_trans
 
 	# exponential moving avg filter
-	if ema_alpha:
+	if ema_alpha < 1.0:
 		wrist_trans = ema_alpha * wrist_trans + (1 - ema_alpha) * get_translation.wrist_trans_prev
 		get_translation.wrist_trans_prev = wrist_trans
 
 	return wrist_trans
 
-def get_pose(hand, body, ema_alpha=0.1) -> np.ndarray:
-	translation = get_translation(hand, body, ema_alpha) # t
-	orientation = get_orientation(hand) # R
+def get_pose(hand, body, ema_alpha_trans=1.0, ema_alpha_rot=1.0) -> np.ndarray:
+	translation = get_translation(hand, body, ema_alpha_trans) # t
+	orientation = get_orientation(hand, ema_alpha_rot) # R
 	transformation = np.eye(4, dtype=np.float32) # [R, t]
 	transformation[:3, :3] = orientation
 	transformation[:3, 3] = translation
 
 	return transformation
 
-def get_orientation(hand) -> np.ndarray:
+@static_var(quat_R_prev=Rotation.from_matrix(np.eye(3)).as_quat())
+def get_orientation(hand, ema_alpha=1.0) -> np.ndarray:
 	# https://google.github.io/mediapipe/images/mobile/hand_landmarks.png
 	lms_world = hand["lms_world"]
 	lm_wrist = lms_world[0]
@@ -66,8 +68,12 @@ def get_orientation(hand) -> np.ndarray:
 	x = np.cross(z, y)
 	x = -x / np.linalg.norm(x)
 	orientation = np.array([x,y,z]).T # rotation matrix
-	# det = np.linalg.det(orientation)
-	# print(f"determinant {det}")
+	
+	if ema_alpha < 1.0:
+		quat_R = Rotation.from_matrix(orientation).as_quat()
+		quat_R = scipy.spatial.geometric_slerp(get_orientation.quat_R_prev, quat_R, ema_alpha)
+		get_orientation.quat_R_prev = quat_R
+		orientation = Rotation.from_quat(quat_R).as_matrix()
 
 	return orientation
 

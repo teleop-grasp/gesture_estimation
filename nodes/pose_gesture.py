@@ -24,7 +24,8 @@ if __name__=="__main__":
 	topic_image_hand = params["topic_image_hand"]
 	topic_image_raw = params["topic_image_raw"]
 	visualize_tracking = params["visualize_tracking"]
-	ema_alpha = params["ema_alpha"] # 0.4 is decent
+	ema_alpha_trans = params["ema_alpha_trans"] # 0.4 is decent
+	ema_alpha_rot = params["ema_alpha_rot"] # 0.2 is decent
 
 	# config
 	LOOP_FREQ = 30 # hz
@@ -74,7 +75,7 @@ if __name__=="__main__":
 			cv_img = draw_hand_lms(cv_img, hand)
 
 			if body is not None:
-				pose = get_pose(hand, body, ema_alpha)
+				pose = get_pose(hand, body, ema_alpha_trans, ema_alpha_rot)
 				pose_msg = to_message(Pose, pose)
 				pub_pose.publish(pose_msg)
 
