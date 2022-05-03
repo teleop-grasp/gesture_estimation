@@ -20,7 +20,7 @@ if __name__=="__main__":
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
 
-        # R = np.eye(4)
+		# R = np.eye(4)
         # pose = to_message(Pose, R)
         # print(pose)
 
@@ -29,8 +29,8 @@ if __name__=="__main__":
 
         # Convert to openCV format
         cv_img = bridge.imgmsg_to_cv2(img_msg)
-        gesture = get_gesture("", cv_img)
+        # gesture = get_gesture("", cv_img)
 
         # print(f"Current gesture: {gesture}")
-        pub_gesture.publish(gesture)
+        # pub_gesture.publish(gesture)
         rate.sleep()

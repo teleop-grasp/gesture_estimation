@@ -10,7 +10,7 @@ from numpy_ros import to_message
 from hand_tracking.gesture_estimation import get_gesture
 from hand_tracking.plot_utils import draw_hand_lms, Pose3DViewer
 from hand_tracking.tracking import track_hands, track_body
-from hand_tracking.pose_estimation import get_pose
+from hand_tracking.pose_estimation import get_pose, calibrate
 
 if __name__=="__main__":
 
@@ -55,9 +55,10 @@ if __name__=="__main__":
 			cv_img = draw_hand_lms(cv_img, hand)
 
 			if body is not None:
-				pose = get_pose(hand, body)
+				pose = get_pose(hand, body, ema_alpha=0.5)
 				pose_msg = to_message(Pose, pose)
 				pub_pose.publish(pose_msg)
+				calibrate(pose, max_num_readings=100)
 
 				if visualize_tracking:
 					Pose3DViewer.plot_pose(pose, hand)

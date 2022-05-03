@@ -1,3 +1,5 @@
+TIP_IDS = [4, 8, 12, 16, 20]
+
 def fingers_up(hand):
 	"""
 	Inspired by  By: Computer Vision Zone
@@ -6,9 +8,7 @@ def fingers_up(hand):
 	Finds how many fingers are open and returns in a list.
 	Considers left and right hands separately
 	:return: List of which fingers are up
-	"""
-
-	TIP_IDS = [4, 8, 12, 16, 20]
+	"""	
 
 	hand_type = hand["type"]
 	lms_img = hand["lms_img"]
