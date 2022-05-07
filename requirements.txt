@@ -3,3 +3,4 @@ mediapipe==0.8.9.1
 numpy==1.22.3
 rospy==1.15.14
 scipy==1.8.0
+numpy-ros==0.1.3

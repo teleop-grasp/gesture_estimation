@@ -93,7 +93,7 @@ if __name__=="__main__":
 				pose_ee = PoseStamped()
 				R_ee = Rotation.from_quat([0.92388, -0.382683, 0, 0])
 				R_d = Rotation.from_matrix(pose[0:3, 0:3])
-				R_ee_d = R_ee * R_d * Rotation.from_rotvec([0, 0, np.pi/2])
+				R_ee_d = R_ee * Rotation.from_rotvec([0, 0, np.pi/2]) * R_d
 				quat_d = R_ee_d.as_quat() # [x, y, z, w]
 
 				pose_ee.pose.position = pose_msg.position
