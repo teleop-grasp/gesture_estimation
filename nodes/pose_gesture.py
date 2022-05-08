@@ -36,7 +36,8 @@ if __name__=="__main__":
 	HAND_TYPE = "right"
 	hand_tracker.max_num_hands = 1
 	hand_tracker.model_complexity = [0, 1][1]
-	body_tracker.model_complexity = [0, 1, 2][2]
+	# body_tracker.model_complexity = [0, 1, 2][2]
+	body = None
 
 	# publishers
 	pub_gesture = rospy.Publisher(topic_grasp_state, Bool, queue_size=1, tcp_nodelay=True)
@@ -68,7 +69,7 @@ if __name__=="__main__":
 		cv_img = bridge.imgmsg_to_cv2(img_msg, desired_encoding="bgr8")
 
 		hands = track_hands(cv_img)
-		body = track_body(cv_img)
+		# body = track_body(cv_img)
 
 		if HAND_TYPE in hands:
 
@@ -79,34 +80,34 @@ if __name__=="__main__":
 			# add hand landmarks to img
 			cv_img = draw_hand_lms(cv_img, hand)
 
-			if body is not None:
-				pose = get_pose(hand, body, ema_alpha_trans, ema_alpha_rot, estimate_depth)
-				pose_msg = to_message(Pose, pose)
-				pub_pose.publish(pose_msg)
+			# if body is not None:
+			pose = get_pose(hand, body, ema_alpha_trans, ema_alpha_rot, estimate_depth)
+			pose_msg = to_message(Pose, pose)
+			pub_pose.publish(pose_msg)
 
-				if estimate_depth:
-					rospy.logwarn_once("calibrating depth normalization...")
-					rospy.logwarn_once("move your hand as far back and then as far forward as possible...")
-					calibrate(pose, max_num_readings=100)
+			if estimate_depth:
+				rospy.logwarn_once("calibrating depth normalization...")
+				rospy.logwarn_once("move your hand as far back and then as far forward as possible...")
+				calibrate(pose, max_num_readings=100)
 
-				# publish to robot
-				pose_ee = PoseStamped()
-				R_ee = Rotation.from_quat([0.92388, -0.382683, 0, 0])
-				R_d = Rotation.from_matrix(pose[0:3, 0:3])
-				R_ee_d = R_ee * Rotation.from_rotvec([0, 0, np.pi/2]) * R_d
-				quat_d = R_ee_d.as_quat() # [x, y, z, w]
+			# publish to robot
+			pose_ee = PoseStamped()
+			R_ee = Rotation.from_quat([0.92388, -0.382683, 0, 0])
+			R_d = Rotation.from_matrix(pose[0:3, 0:3])
+			R_ee_d = R_ee * Rotation.from_rotvec([0, 0, np.pi/2]) * R_d
+			quat_d = R_ee_d.as_quat() # [x, y, z, w]
 
-				pose_ee.pose.position = pose_msg.position
-				pose_ee.pose.position.y = pose_ee.pose.position.y * 2 - 1
-				pose_ee.pose.position.y = max(min(pose_ee.pose.position.y, 0.25), -0.25)
-				pose_ee.pose.position.z = max(pose_ee.pose.position.z, 0.5)
+			pose_ee.pose.position = pose_msg.position
+			pose_ee.pose.position.y = pose_ee.pose.position.y * 2 - 1
+			pose_ee.pose.position.y = max(min(pose_ee.pose.position.y, 0.25), -0.25)
+			pose_ee.pose.position.z = max(pose_ee.pose.position.z, 0.5)
 
-				pose_ee.pose.orientation.x = quat_d[0]
-				pose_ee.pose.orientation.y = quat_d[1]
-				pose_ee.pose.orientation.z = quat_d[2]
-				pose_ee.pose.orientation.w = quat_d[3]
+			pose_ee.pose.orientation.x = quat_d[0]
+			pose_ee.pose.orientation.y = quat_d[1]
+			pose_ee.pose.orientation.z = quat_d[2]
+			pose_ee.pose.orientation.w = quat_d[3]
 
-				pub_ee.publish(pose_ee)
+			pub_ee.publish(pose_ee)
 
 			if visualize_tracking:
 				g_pose, g_hand = pose, hand
