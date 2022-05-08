@@ -90,6 +90,25 @@ if __name__=="__main__":
 				rospy.logwarn_once("move your hand as far back and then as far forward as possible...")
 				calibrate(pose, max_num_readings=100)
 
+			# publish to robot
+			pose_ee = PoseStamped()
+			R_ee = Rotation.from_quat([0.92388, -0.382683, 0, 0])
+			R_d = Rotation.from_matrix(pose[0:3, 0:3])
+			R_ee_d = R_ee * Rotation.from_rotvec([0, 0, np.pi/2]) * R_d
+			quat_d = R_ee_d.as_quat() # [x, y, z, w]
+
+			pose_ee.pose.position = pose_msg.position
+			pose_ee.pose.position.y = pose_ee.pose.position.y * 2 - 1
+			pose_ee.pose.position.y = max(min(pose_ee.pose.position.y, 0.25), -0.25)
+			pose_ee.pose.position.z = max(pose_ee.pose.position.z, 0.5)
+
+			pose_ee.pose.orientation.x = quat_d[0]
+			pose_ee.pose.orientation.y = quat_d[1]
+			pose_ee.pose.orientation.z = quat_d[2]
+			pose_ee.pose.orientation.w = quat_d[3]
+
+			# pub_ee.publish(pose_ee)
+
 			if visualize_tracking:
 				g_pose, g_hand = pose, hand
 				pub_img_hand.publish(bridge.cv2_to_imgmsg(cv_img, encoding="bgr8"))
